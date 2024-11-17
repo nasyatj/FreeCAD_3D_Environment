@@ -3,7 +3,12 @@ import FreeCAD
 import FreeCADGui
 import Part
 import Mesh
+from PySide2.QtCore import Signal
 from commands import CommandProcessor
+import threading
+
+from test_commands import ServerConnect
+
 
 class CommandWindow(QtWidgets.QWidget):
     def __init__(self, submit_callback, export_callback, parent=None):
@@ -131,6 +136,8 @@ class CommandWindow(QtWidgets.QWidget):
             self.move(frame_geometry.topLeft())
 
 class BoxGeneratorApp(QtWidgets.QMainWindow):
+    data_received = Signal(str)  # Signal for server data
+
     def __init__(self):
         super().__init__()
         
@@ -160,12 +167,21 @@ class BoxGeneratorApp(QtWidgets.QMainWindow):
             self.process_command,
             self.export_stl
         )
-        
+
+        # Initialize ServerConnect and pass the signal's emit method as a callback
+        self.server_connect = ServerConnect(self.data_received.emit, self.doc)
+
+        # Start the server in a separate thread
+        self.server_connect.run_server_in_thread()
+
+        # Connect the signal to the process_server_data method
+        self.data_received.connect(self.server_connect.process_server_data)
+
         # Show help text
         self._show_help()
         
         self.command_window.show()
-    
+
     def export_stl(self):
         """Export all objects in the model to STL."""
         try:
@@ -263,3 +279,4 @@ Examples:
         """Handle application closing."""
         self.command_window.close()
         super().closeEvent(event)
+

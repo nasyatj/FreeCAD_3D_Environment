@@ -23,7 +23,7 @@ def setup_freecad_env():
         FREECAD_LIB
     ])
 
-    print("Current sys.path:", sys.path)  # Debug print to verify paths
+    #print("Current sys.path:", sys.path)  # Debug print to verify paths
 
     # Set required environment variables
     os.environ['PYTHONHOME'] = FREECAD_ROOT

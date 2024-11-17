@@ -7,11 +7,6 @@ import FreeCADGui
 import Part
 import socket
 
-# Set up the server
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(('localhost', 12345))  # Host and port
-server.listen(1)
-print("FreeCAD server listening on port 12345...")
 
 class CommandProcessor:
     def __init__(self, doc):
