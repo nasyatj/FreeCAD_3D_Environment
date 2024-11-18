@@ -77,7 +77,7 @@ class ServerConnect:
                 self._create_object_at_coordinates(x, y, z)
 
             else:
-                # Handle other types of commands (Move,
+                # Handle other types of commands (Move)
                 print(f"Received unknown command: {data}")
 
         except ValueError as e:
@@ -87,7 +87,7 @@ class ServerConnect:
     def _create_object_at_coordinates(self, x, y, z):
 
         # Create a sphere (or any other object) at the given coordinates
-        sphere = CommandProcessor._create_sphere(['1'])
+        sphere = Part.makeSphere(1) #change to create functions from commands.py
         sphere.Placement = FreeCAD.Placement(FreeCAD.Vector(x, y, z), FreeCAD.Rotation())
 
         # Add the object to the document
