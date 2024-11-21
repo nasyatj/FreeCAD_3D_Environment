@@ -142,14 +142,18 @@ class BoxGeneratorApp(QtWidgets.QMainWindow):
         super().__init__()
         
         # Initialize FreeCAD document
-        self.doc = FreeCAD.newDocument("BoxExample")
+        self.doc = FreeCAD.newDocument("HandTracking")
+        FreeCAD.setActiveDocument("HandTracking")
+        FreeCADGui.setActiveDocument("HandTracking")
+
+        # White bg for handtracking window
         self.setup_viewer()
-        
+
         # Initialize command processor
         self.command_processor = CommandProcessor(self.doc)
         
         # Set up the main window
-        self.setWindowTitle("FreeCAD Command Interface")
+        self.setWindowTitle("FreeCAD Hand Tracking Interface")
         self.setGeometry(100, 100, 1200, 800)
         
         # Create central widget
@@ -171,15 +175,15 @@ class BoxGeneratorApp(QtWidgets.QMainWindow):
         # Initialize ServerConnect and pass the signal's emit method as a callback
         self.server_connect = ServerConnect(self.data_received.emit, self.doc)
 
+        FreeCADGui.ActiveDocument.ActiveView.viewAxonometric()
+        FreeCADGui.ActiveDocument.ActiveView.fitAll()
+
         # Start the server in a separate thread
         self.server_connect.run_server_in_thread()
 
         # Connect the signal to the process_server_data method
         self.data_received.connect(self.server_connect.process_server_data)
 
-        # Show help text
-        self._show_help()
-        
         self.command_window.show()
 
     def export_stl(self):
@@ -230,7 +234,7 @@ class BoxGeneratorApp(QtWidgets.QMainWindow):
         param.SetUnsigned("BackgroundColor", 4294967295)
         param.SetBool("Simple", True)
         param.SetBool("Gradient", False)
-    
+
     
     def toggle_command_window(self):
         """Toggle the command window visibility"""
