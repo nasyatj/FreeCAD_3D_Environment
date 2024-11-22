@@ -1,0 +1,14 @@
+Changes 21/11/24 2:24AM
+
+START SERVER:
+1) Start test/main.py
+2) Start hand_tracking_client.py
+
+HOW DOES IT WORK?
+
+main.py calls the main_window.py and widgets to create the window. A socket is created and data is collected from hand_tracking_client.py
+and send to test_commands.py. Data is then processed in test_commands.py.
+
+mostly everything to do with creating the lines and spheres and labels on the GUI is on test_commands.py.
+
+I took out gesture recognition for the time being since it was annoying to deal with during testing. Will add it back in the morning 

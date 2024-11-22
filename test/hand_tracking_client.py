@@ -9,12 +9,20 @@ mp_draw = mp.solutions.drawing_utils
 
 # Set up the socket
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_address = ('localhost', 12345)
+server_address = ('localhost', 12340)
 
 # Open webcam
 cap = cv2.VideoCapture(0)
 
+width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
+print(f"Default resolution: {int(width)}x{int(height)}")
+
+width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+
+print(f"Default resolution: {int(width)}x{int(height)}")
 def format_coordinates(hand_landmarks, frame_shape):
     """matrix format: finger_id,x,y;finger_id,x,y;..."""
     finger_coords = []
@@ -39,6 +47,41 @@ def format_coordinates(hand_landmarks, frame_shape):
             finger_coords.append(f"{finger_id},{x},{y}")
 
     return ";".join(finger_coords) + "\n"
+
+
+# MARK NOTE: Only really needed to you really wanna check for a fist. Otherwise, it just does nothing but that. If you
+# decide you want this, there's also another bit you need to uncomment too. Just ctrl+f is_fist() to find it.
+
+def is_fist(hand_landmarks):
+    """Determine if the hand forms a fist based on fingertip proximity to the palm."""
+
+
+    # Define distances between fingertip and respective base joints
+    fingertips = [
+        mp_hands.HandLandmark.THUMB_TIP,
+        mp_hands.HandLandmark.INDEX_FINGER_TIP,
+        mp_hands.HandLandmark.MIDDLE_FINGER_TIP,
+        mp_hands.HandLandmark.RING_FINGER_TIP,
+        mp_hands.HandLandmark.PINKY_TIP
+    ]
+
+    bases = [
+        mp_hands.HandLandmark.THUMB_CMC,
+        mp_hands.HandLandmark.INDEX_FINGER_MCP,
+        mp_hands.HandLandmark.MIDDLE_FINGER_MCP,
+        mp_hands.HandLandmark.RING_FINGER_MCP,
+        mp_hands.HandLandmark.PINKY_MCP
+    ]
+
+    for tip, base in zip(fingertips, bases):
+        tip_z = hand_landmarks.landmark[tip].z
+        base_z = hand_landmarks.landmark[base].z
+        print(f"Tip Z: {tip_z}, Base Z: {base_z}, Difference: {tip_z - base_z}")
+
+        if tip_z - base_z > -0.1:  # Adjust this threshold based on testing
+            print(f"Finger {tip} not forming a fist.")
+            return False
+    return True
 
 
 # Connect to server
@@ -70,6 +113,15 @@ try:
                 coord_str = format_coordinates(hand_landmarks, frame.shape)
                 client.send(coord_str.encode('utf-8'))
                 print(f"Sent: {coord_str.strip()}")  # Strip to remove newline when printing
+
+        #Check for a fist
+        if results.multi_hand_landmarks:
+            for hand_landmarks in results.multi_hand_landmarks:
+                if is_fist(hand_landmarks):
+                    client.send("fist_detected".encode('utf-8'))
+                else:
+                    coord_str = format_coordinates(hand_landmarks, frame.shape)
+                    client.send(coord_str.encode('utf-8'))
 
         # Display frame (optional - will still work without seeing camera feed)
         cv2.imshow("Hand Tracking", frame)
