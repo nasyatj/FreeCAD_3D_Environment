@@ -105,8 +105,8 @@ class BoxGeneratorApp(QtWidgets.QMainWindow):
         self.box.Height = height
         self.doc.recompute()
 
-    def export_stl(self):
-     try:
+   def export_stl(self):
+    try:
         length = self.length_input.value()
         width = self.width_input.value()
         height = self.height_input.value()
@@ -132,7 +132,7 @@ class BoxGeneratorApp(QtWidgets.QMainWindow):
         print(f"Exported STL file: {export_path}")
         self.status_label.setText(f"Exported: {export_path}")
 
-     except Exception as e:
+    except Exception as e:
         self.status_label.setText(f"Error: {str(e)}")
         print(f"Error exporting STL: {e}")
 

@@ -2,7 +2,7 @@ import os
 import sys
 
 # Add FreeCAD libraries to Python's sys.path
-FREECAD_ROOT = r'C:\Users\kendr\AppData\Local\Programs\FreeCAD 1.0'
+FREECAD_ROOT = r'C:\Users\kendr\AppData\Local\Programs\FreeCAD 0.21\bin\python.exe'
 FREECAD_LIB = os.path.join(FREECAD_ROOT, 'bin')
 
 if not os.path.exists(FREECAD_ROOT):
@@ -106,35 +106,24 @@ class BoxGeneratorApp(QtWidgets.QMainWindow):
         self.doc.recompute()
 
     def export_stl(self):
-     try:
-        length = self.length_input.value()
-        width = self.width_input.value()
-        height = self.height_input.value()
-        mesh_deviation = self.quality_slider.value() / 100.0
+        try:
+            length = self.length_input.value()
+            width = self.width_input.value()
+            height = self.height_input.value()
+            mesh_deviation = self.quality_slider.value() / 100.0
 
-        self.status_label.setText("Exporting...")
-        QtWidgets.QApplication.processEvents()
+            self.status_label.setText("Exporting...")
+            QtWidgets.QApplication.processEvents()
 
-        # Create the mesh
-        shape = self.box.Shape
-        mesh = Mesh.Mesh()
-        mesh.addFacets(shape.tessellate(mesh_deviation))
+            shape = self.box.Shape
+            mesh = Mesh.Mesh()
+            mesh.addFacets(shape.tessellate(mesh_deviation))
+            stl_name = f"box_{length}x{width}x{height}.stl"
+            mesh.write(stl_name)
+            self.status_label.setText(f"Exported: {stl_name}")
 
-        # Build the path to save in the script's directory
-        current_directory = os.path.dirname(__file__)  # Directory where the script is located
-        stl_name = f"box_{length}x{width}x{height}.stl"
-        export_path = os.path.join(current_directory, stl_name)
-
-        # Write the STL file
-        mesh.write(export_path)
-
-        # Update the status and print the file path for verification
-        print(f"Exported STL file: {export_path}")
-        self.status_label.setText(f"Exported: {export_path}")
-
-     except Exception as e:
-        self.status_label.setText(f"Error: {str(e)}")
-        print(f"Error exporting STL: {e}")
+        except Exception as e:
+            self.status_label.setText(f"Error: {str(e)}")
 
 if __name__ == "__main__":
     try:

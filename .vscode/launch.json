@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: FreeCAD",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",               // This runs the currently open file
+            "console": "integratedTerminal",    // Use the integrated terminal for output
+            "pythonPath": "C:\\Users\\kendr\\AppData\\Local\\Programs\\FreeCAD 0.21\\bin\\python.exe" // Path to FreeCAD's Python
+        }
+    ]
+}
